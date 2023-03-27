@@ -1,3 +1,5 @@
+import os
+
 import cv2
 import pika
 import threading
@@ -51,6 +53,18 @@ while True:
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
+    # if c is pressed, then clear the speech data
+    if cv2.waitKey(1) & 0xFF == ord('c'):
+        speech_data.clear()
+
+    # if s is pressed, then save the speech data to a text file
+    if cv2.waitKey(1) & 0xFF == ord('s'):
+        with open('speech.txt', 'w') as f:
+            f.write(os.linesep.join(speech_data))
+
 # release the video stream and destroy all windows
 cap.release()
 cv2.destroyAllWindows()
+
+# stop the RabbitMQ consumer thread
+consumer_thread.join()

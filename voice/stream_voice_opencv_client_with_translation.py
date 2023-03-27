@@ -5,7 +5,8 @@ import pika
 import threading
 import deepl
 
-speech_data = []
+original_speech_data = []
+translated_speech_data = []
 
 
 class DeepLTranslator():
@@ -37,7 +38,8 @@ class RabbitMQConsumer:
         original_speech = body.decode('utf-8')
         translated_speech = DeepLTranslator().translate(original_speech, 'EN', 'NL').text
 
-        speech_data.append(translated_speech)
+        original_speech_data.append(original_speech)
+        translated_speech_data.append(translated_speech)
 
 
 # create instance of RabbitMQ consumer class
@@ -49,6 +51,14 @@ consumer_thread.start()
 
 # start the video stream
 cap = cv2.VideoCapture(0)
+
+# set the video frame size
+cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
+cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
+
+# set the video frame rate
+cap.set(cv2.CAP_PROP_FPS, 60)
+
 while True:
     # read a frame from the video stream
     ret, frame = cap.read()
@@ -58,16 +68,41 @@ while True:
         break
 
     # display the recognized text
-    if len(speech_data) > 0:
+    if len(original_speech_data) > 0:
+        if len(original_speech_data) > 10:
+            original_speech_data.pop(0)
+            translated_speech_data.pop(0)
+
         # put the text at the bottom center of the frame and make the font size 12pt and white with border and gray background
-        cv2.putText(frame, speech_data[-1], (int(frame.shape[1] / 2) - 50, frame.shape[0] - 10),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 1, cv2.LINE_AA)
+        cv2.putText(frame, original_speech_data[-1], (int(frame.shape[1] / 4) - 100, frame.shape[0] - 40),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2, cv2.LINE_AA)
+
+        # put the translated text at the top center of the frame and make the font size 12pt and white with border and gray background
+        cv2.putText(frame, translated_speech_data[-1], (int(frame.shape[1] / 4) - 100, 40),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2, cv2.LINE_AA)
+
+    else:
+        cv2.putText(frame, '.............................', (int(frame.shape[1] / 2) - 100, frame.shape[0] - 40),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2, cv2.LINE_AA)
 
     # display the video frame
     cv2.imshow('frame', frame)
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
+    # if c is pressed, then clear the speech data
+    if cv2.waitKey(1) & 0xFF == ord('c'):
+        original_speech_data.clear()
+
+    # if s is pressed, then save the speech data to a text file
+    if cv2.waitKey(1) & 0xFF == ord('s'):
+        with open('speech_data_translated.txt', 'w') as f:
+            f.write(os.linesep.join(original_speech_data))
+
+
 # release the video stream and destroy all windows
 cap.release()
 cv2.destroyAllWindows()
+
+# stop the RabbitMQ consumer thread
+consumer_thread.join()

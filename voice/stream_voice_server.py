@@ -1,6 +1,9 @@
 import pika
 import speech_recognition as sr
 
+# create a timer to measeue the timet between two speech recognition events
+timer = 0
+
 # initialize speech recognizer
 r = sr.Recognizer()
 
@@ -10,6 +13,15 @@ channel = connection.channel()
 
 # create message queue
 channel.queue_declare(queue='recognized_text')
+
+# increase the volume of the microphone
+r.energy_threshold = 4000
+
+# increase the sensitivity of the microphone
+r.dynamic_energy_threshold = True
+
+# set stream chunk size
+r.chunk_size = 1024 * 8
 
 
 # function to recognize speech and publish recognized text to message queue
