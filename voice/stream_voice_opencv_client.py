@@ -43,7 +43,8 @@ while True:
 
     # display the recognized text
     if len(speech_data) > 0:
-        cv2.putText(frame, speech_data[-1], (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+        # put the text at the bottom center of the frame and make the font size 12pt and white with border and gray background
+        cv2.putText(frame, speech_data[-1], (int(frame.shape[1] / 2) - 100, frame.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 255), 1, cv2.LINE_AA)
 
     # display the video frame
     cv2.imshow('frame', frame)
