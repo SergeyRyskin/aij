@@ -1,8 +1,21 @@
+import os
+
 import cv2
 import pika
 import threading
+import deepl
 
 speech_data = []
+
+
+class DeepLTranslator():
+    def __init__(self, api_key="66057fb9-45bb-df21-813c-20c6c8275301:fx"):
+        self.api_key = api_key
+
+    def translate(self, text, source_lang, target_lang):
+        translator = deepl.Translator(self.api_key)
+        return translator.translate_text(text, source_lang=source_lang, target_lang=target_lang)
+
 
 # define the RabbitMQ consumer class
 class RabbitMQConsumer:
@@ -21,7 +34,10 @@ class RabbitMQConsumer:
         self.channel.start_consuming()
 
     def on_message(self, ch, method, properties, body):
-        speech_data.append(body.decode('utf-8'))
+        original_speech = body.decode('utf-8')
+        translated_speech = DeepLTranslator().translate(original_speech, 'EN', 'NL').text
+
+        speech_data.append(translated_speech)
 
 
 # create instance of RabbitMQ consumer class
@@ -44,7 +60,8 @@ while True:
     # display the recognized text
     if len(speech_data) > 0:
         # put the text at the bottom center of the frame and make the font size 12pt and white with border and gray background
-        cv2.putText(frame, speech_data[-1], (int(frame.shape[1] / 2) - 50, frame.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 1, cv2.LINE_AA)
+        cv2.putText(frame, speech_data[-1], (int(frame.shape[1] / 2) - 50, frame.shape[0] - 10),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 1, cv2.LINE_AA)
 
     # display the video frame
     cv2.imshow('frame', frame)
