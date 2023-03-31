@@ -27,11 +27,14 @@ class RabbitMQConsumer:
 
 
 # create instance of RabbitMQ consumer class
-rabbitmq_consumer = RabbitMQConsumer('localhost', 'recognized_text')
+voice_consumer = RabbitMQConsumer('localhost', 'recognized_text')
+
+# create an instance of RabbitMQ consumer for the translation
+translation_consumer = RabbitMQConsumer('localhost', 'translation_data')
 
 # start the RabbitMQ consumer thread
-consumer_thread = threading.Thread(target=rabbitmq_consumer.start_consuming)
-consumer_thread.start()
+voice_thread = threading.Thread(target=voice_consumer.start_consuming)
+voice_thread.start()
 
 # start the video stream
 cap = cv2.VideoCapture(0)
@@ -67,4 +70,4 @@ cap.release()
 cv2.destroyAllWindows()
 
 # stop the RabbitMQ consumer thread
-consumer_thread.join()
+voice_thread.join()

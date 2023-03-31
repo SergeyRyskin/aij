@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="pompy.xsd">
+    
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.codesapienbe</groupId>
+    <artifactId>ai-journalist</artifactId>
+    <version>1.0.0</version>
+    <name>ai-journalist</name>
+    <description>AI Journalist</description>
+    <url>https://github.com/codesapienbe/ai-journalist</url>
+    <packaging>pip</packaging>
+
+    <properties>
+        <python.version>3.11</python.version>
+        <python.executable>python</python.executable>
+    </properties>
+
+    <dependencies>
+
+        <!-- Pylint: Python code static checker -->
+        <dependency>
+            <artifactId>pylint</artifactId>
+            <groupId>org.codesapienbe.python.deps</groupId>
+        </dependency>
+
+        <!-- Pytest: Python unit testing framework -->
+        <dependency>
+            <artifactId>pytest</artifactId>
+            <groupId>org.codesapienbe.python.deps</groupId>
+        </dependency>
+
+        <!-- Pyinstaller: Python executable builder -->
+        <dependency>
+            <artifactId>pyinstaller</artifactId>
+            <groupId>org.codesapienbe.python.deps</groupId>
+        </dependency>
+
+        <!-- PEP8: Python code style checker -->
+        <dependency>
+            <artifactId>pep8</artifactId>
+            <groupId>org.codesapienbe.python.deps</groupId>
+        </dependency>
+
+        <!-- jupyter: Python notebook server -->
+        <dependency>
+            <artifactId>jupyter</artifactId>
+            <groupId>org.codesapienbe.python.deps</groupId>
+        </dependency>
+
+        <!-- nbconvert: Python notebook converter -->
+        <dependency>
+            <artifactId>nbconvert</artifactId>
+            <groupId>org.codesapienbe.python.deps</groupId>
+        </dependency>
+
+        <!-- NBFormat: Python notebook format library -->
+        <dependency>
+            <artifactId>nbformat</artifactId>
+            <groupId>org.codesapienbe.python.deps</groupId>
+        </dependency>
+
+        <!-- Numpy: Python scientific computing library -->
+        <dependency>
+            <artifactId>numpy</artifactId>
+            <groupId>org.codesapienbe.python.deps</groupId>
+        </dependency>
+
+        <!-- Pandas: Python data analysis library -->
+        <dependency>
+            <artifactId>pandas</artifactId>
+            <groupId>org.codesapienbe.python.deps</groupId>
+        </dependency>
+
+        <!-- scikit-learn: Python machine learning library -->
+        <dependency>
+            <artifactId>scikit-learn</artifactId>
+            <groupId>org.codesapienbe.python.deps</groupId>
+        </dependency>
+
+        <!-- Seaborn: Python data visualization library -->
+        <dependency>
+            <artifactId>seaborn</artifactId>
+            <groupId>org.codesapienbe.python.deps</groupId>
+        </dependency>
+
+        <!-- Matplotlib: Python plotting library -->
+        <dependency>
+            <artifactId>matplotlib</artifactId>
+            <groupId>org.codesapienbe.python.deps</groupId>
+        </dependency>
+
+        <!-- Plotly: Python plotting library -->
+        <dependency>
+            <artifactId>plotly</artifactId>
+            <groupId>org.codesapienbe.python.deps</groupId>
+        </dependency>
+
+        <!-- PyWidgets: Python interactive widgets library -->
+        <dependency>
+            <artifactId>ipywidgets</artifactId>
+            <groupId>org.codesapienbe.python.deps</groupId>
+        </dependency>
+
+        <!-- MediaPipe: Google's cross-platform computer vision framework -->
+        <dependency>
+            <artifactId>mediapipe</artifactId>
+            <groupId>org.codesapienbe.python.deps</groupId>
+        </dependency>
+
+        <!-- OpenCV: Python computer vision library -->
+        <dependency>
+            <artifactId>opencv-python</artifactId>
+            <groupId>org.codesapienbe.python.deps</groupId>
+        </dependency>
+
+        <!-- Tensorflow: Python machine learning library -->
+        <dependency>
+            <artifactId>tensorflow</artifactId>
+            <groupId>org.codesapienbe.python.deps</groupId>
+        </dependency>
+
+        <!-- Keras: Python deep learning library -->
+        <dependency>
+            <artifactId>keras</artifactId>
+            <groupId>org.codesapienbe.python.deps</groupId>
+        </dependency>
+
+        <!-- PyTorch: Python machine learning library -->
+        <dependency>
+            <artifactId>torch</artifactId>
+            <groupId>org.codesapienbe.python.deps</groupId>
+        </dependency>
+
+        <!-- DeepFace: Python deep learning library for Face and Emotion Recognition -->
+        <dependency>
+            <artifactId>deepface</artifactId>
+            <groupId>org.codesapienbe.python.deps</groupId>
+        </dependency>
+
+        <!-- News API: Python library for accessing the News API -->
+        <dependency>
+            <artifactId>newsapi-python</artifactId>
+            <groupId>org.codesapienbe.python.deps</groupId>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codesapienbe.python.build</groupId>
+                <artifactId>python-maven-plugin</artifactId>
+                <version>1.0.0</version>
+                <configuration>
+                    <source>${python.version}</source>
+                    <target>${python.version}</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

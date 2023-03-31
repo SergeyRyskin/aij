@@ -3,19 +3,9 @@ import os
 import cv2
 import pika
 import threading
-import deepl
 
 original_speech_data = []
 translated_speech_data = []
-
-
-class DeepLTranslator():
-    def __init__(self, api_key="66057fb9-45bb-df21-813c-20c6c8275301:fx"):
-        self.api_key = api_key
-
-    def translate(self, text, source_lang, target_lang):
-        translator = deepl.Translator(self.api_key)
-        return translator.translate_text(text, source_lang=source_lang, target_lang=target_lang)
 
 
 # define the RabbitMQ consumer class
@@ -36,18 +26,22 @@ class RabbitMQConsumer:
 
     def on_message(self, ch, method, properties, body):
         original_speech = body.decode('utf-8')
-        translated_speech = DeepLTranslator().translate(original_speech, 'EN', 'NL').text
-
         original_speech_data.append(original_speech)
-        translated_speech_data.append(translated_speech)
 
 
 # create instance of RabbitMQ consumer class
-rabbitmq_consumer = RabbitMQConsumer('localhost', 'recognized_text')
+original_speech_consumer = RabbitMQConsumer('localhost', 'recognized_text')
+
+# create an instance of the RabbitMQ for the translated speech
+translated_speech_consumer = RabbitMQConsumer('localhost', 'translated_data')
 
 # start the RabbitMQ consumer thread
-consumer_thread = threading.Thread(target=rabbitmq_consumer.start_consuming)
-consumer_thread.start()
+original_speech_thread = threading.Thread(target=original_speech_consumer.start_consuming)
+original_speech_thread.start()
+
+# start the RabbitMQ consumer thread
+translated_speech_thread = threading.Thread(target=translated_speech_consumer.start_consuming)
+translated_speech_thread.start()
 
 # start the video stream
 cap = cv2.VideoCapture(0)
@@ -99,10 +93,9 @@ while True:
         with open('speech_data_translated.txt', 'w') as f:
             f.write(os.linesep.join(original_speech_data))
 
-
 # release the video stream and destroy all windows
 cap.release()
 cv2.destroyAllWindows()
 
 # stop the RabbitMQ consumer thread
-consumer_thread.join()
+original_speech_thread.join()

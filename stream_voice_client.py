@@ -5,7 +5,7 @@ connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
 channel = connection.channel()
 
 # create message queue
-channel.queue_declare(queue='recognized_text')
+channel.queue_declare(queue='voice_data')
 
 
 # function to consume messages from message queue
@@ -14,6 +14,6 @@ def callback(ch, method, properties, body):
 
 
 # start consuming messages from message queue
-channel.basic_consume(queue='recognized_text', on_message_callback=callback, auto_ack=True)
+channel.basic_consume(queue='voice_data', on_message_callback=callback, auto_ack=True)
 print('Waiting for recognized text messages...')
 channel.start_consuming()
