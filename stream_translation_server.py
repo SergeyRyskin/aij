@@ -3,7 +3,7 @@ import os
 import deepl
 
 
-class RabbitMQTranslator:
+class TranslationServer:
     def __init__(self, input_queue_name, output_queue_name, rabbitmq_host='localhost'):
         self.rabbitmq_host = rabbitmq_host
         self.input_queue_name = input_queue_name
@@ -32,6 +32,8 @@ class RabbitMQTranslator:
         self.input_channel.start_consuming()
 
     def on_message(self, channel, method, properties, body):
+        if body is None:
+            self.send_message('.' * 10)
         message_text = body.decode('utf-8')
         translated_text = self.translate(message_text)
         self.send_message(translated_text)
@@ -43,11 +45,20 @@ class RabbitMQTranslator:
 
     def send_message(self, message):
         self.output_channel.basic_publish(exchange='', routing_key=self.output_queue_name, body=message)
+        print(message)
 
     def close(self):
-        self.connection.close()
+        self.input_channel.close()
+        self.output_channel.close()
+
+        if self.connection is not None and not self.connection.is_closed:
+            self.connection.close()
+
+    def reconnect(self):
+        self.close()
+        self.connect()
 
 
 if __name__ == '__main__':
-    translator = RabbitMQTranslator('voice_data', 'translation_data')
+    translator = TranslationServer('speech_to_text_stream', 'translated_text_stream')
     translator.start_consuming()

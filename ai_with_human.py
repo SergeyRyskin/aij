@@ -9,7 +9,7 @@ translated_speech_data = []
 
 
 # define the RabbitMQ consumer class
-class RabbitMQConsumer:
+class MessageBroker:
 
     def __init__(self, host, queue_name):
         self.host = host
@@ -30,10 +30,10 @@ class RabbitMQConsumer:
 
 
 # create instance of RabbitMQ consumer class
-original_speech_consumer = RabbitMQConsumer('localhost', 'recognized_text')
+original_speech_consumer = MessageBroker('localhost', 'speech_to_text_stream')
 
 # create an instance of the RabbitMQ for the translated speech
-translated_speech_consumer = RabbitMQConsumer('localhost', 'translated_data')
+translated_speech_consumer = MessageBroker('localhost', 'translated_text_stream')
 
 # start the RabbitMQ consumer thread
 original_speech_thread = threading.Thread(target=original_speech_consumer.start_consuming)

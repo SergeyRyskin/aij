@@ -5,7 +5,7 @@ In this code, we defined a MessageBroker class that encapsulates the functionali
 import pika
 
 
-class VoiceToTextClient:
+class TranslationClient:
     def __init__(self, host):
         self.host = host
         self.connection = None
@@ -14,10 +14,10 @@ class VoiceToTextClient:
     def connect(self):
         self.connection = pika.BlockingConnection(pika.ConnectionParameters(self.host))
         self.channel = self.connection.channel()
-        self.channel.queue_declare(queue='speech_to_text_stream')
+        self.channel.queue_declare(queue='translated_text_stream')
 
     def consume(self, callback):
-        self.channel.basic_consume(queue='speech_to_text_stream', on_message_callback=callback, auto_ack=True)
+        self.channel.basic_consume(queue='translated_text_stream', on_message_callback=callback, auto_ack=True)
         print('Waiting for recognized text messages...')
         self.channel.start_consuming()
 
@@ -32,7 +32,7 @@ def handle_message(ch, method, properties, body):
 
 
 def main():
-    message_broker = VoiceToTextClient('localhost')
+    message_broker = TranslationClient('localhost')
     message_broker.connect()
     try:
         message_broker.consume(handle_message)
