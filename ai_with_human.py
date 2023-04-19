@@ -203,7 +203,8 @@ Google has announced that it will ban political ads on its platform.
 TikTok has now been banned in India.
 The US government has banned TikTok and WeChat in the country."""
 
-animation.generate_animation(50, random.choice(tech_news.split('\n')))
+# animation.generate_animation(50, random.choice(tech_news.split('\n')))
+# animation.destroy_animation()
 
 while True:
     # read a frame from the video stream
@@ -214,22 +215,27 @@ while True:
         break
 
     # display the recognized text
-    if len(original_speech_data) > 0:
-        if len(original_speech_data) > 10:
-            original_speech_data.pop(0)
-            translated_speech_data.pop(0)
-
+    if len(original_speech_data) > 1:
         # put the text at the bottom center of the frame and make the font size 12pt and white with border and gray background
         cv2.putText(frame, original_speech_data[-1], (int(frame.shape[1] / 4) - 100, frame.shape[0] - 40),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2, cv2.LINE_AA)
-
-        # put the translated text at the top center of the frame and make the font size 12pt and white with border and gray background
-        cv2.putText(frame, translated_speech_data[-1], (int(frame.shape[1] / 4) - 100, 40),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2, cv2.LINE_AA)
+                cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2, cv2.LINE_AA)
+        # remove the oldest text from the list
+        original_speech_data.pop(0)
 
     else:
         cv2.putText(frame, '.............................', (int(frame.shape[1] / 2) - 100, frame.shape[0] - 40),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2, cv2.LINE_AA)
+
+    if len(translated_speech_data) > 1:
+        # put the translated text at the top center of the frame and make the font size 12pt and white with border and gray background
+        cv2.putText(frame, translated_speech_data[-1], (int(frame.shape[1] / 4) - 100, 40),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2, cv2.LINE_AA)
+        translated_speech_data.pop(0)
+
+    else:
+        cv2.putText(frame, '.............................', (int(frame.shape[1] / 2) - 100, 40),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2, cv2.LINE_AA)
+
 
     # display the video frame
     cv2.imshow('frame', frame)
