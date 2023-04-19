@@ -4,6 +4,8 @@ import cvzone
 import numpy as np
 import screeninfo
 
+import pandas as pd
+
 import pika
 import threading
 
@@ -15,10 +17,10 @@ cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1024)
 cap.set(cv2.CAP_PROP_FPS, 60)
 
 # text as one line string
-text = ' '.join(df['title'].tolist())
+titles = ' '.join(df['title'].tolist())
 
 # add '###' between each title
-text = ' ... | '.join(df['title'].tolist())
+titles = ' ... | '.join(df['title'].tolist())
 
 mp_drawing = mp.solutions.drawing_utils
 mp_drawing_styles = mp.solutions.drawing_styles
@@ -75,7 +77,7 @@ with mp_hands.Hands(
 
                 # if left hand is raised then move the text to the left
                 if hand_landmarks.landmark[mp_hands.HandLandmark.WRIST].x < 0.2 and len(results.multi_hand_landmarks) == 1:
-                    text = text[1:] + text[0]
+                    titles = titles[1:] + titles[0]
                     direction = 0
                     font_size = 12
                     color = standard_text_color
@@ -101,12 +103,12 @@ with mp_hands.Hands(
             box_size = 50
 
         if direction == 0:
-            text = text[1:] + text[0]
+            titles = titles[1:] + titles[0]
         elif direction == 1:
-            text = text[-1] + text[:-1]
+            titles = titles[-1] + titles[:-1]
 
         # draw the text
-        cv2.putText(image, text, (2, image.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, font_size / 12, color, 2)
+        cv2.putText(image, titles, (2, image.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, font_size / 12, color, 2)
 
         # put a logo in the top left corner
         logo = cv2.imread('logo.png')

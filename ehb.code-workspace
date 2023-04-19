@@ -1,0 +1,20 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"liveServer.settings.port": 5501,
+		"cSpell.words": [
+			"dataframe",
+			"dtype",
+			"imread",
+			"imshow",
+			"imwrite",
+			"iterrows",
+			"newsapi",
+			"waitkey"
+		]
+	}
+}
