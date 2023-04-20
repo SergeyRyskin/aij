@@ -637,3 +637,29 @@ after installation is done you can run the following command to install all the 
 pipenv install
 ```
 
+## Testing python scripts
+
+To test the python scripts you can run the following command
+
+## Installation of required server apps
+
+
+```powershell
+Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+irm get.scoop.sh | iex
+```
+
+### Install RabbitMQ via scoop package manager
+
+```console
+scoop bucket add extras
+scoop install rabbitmq
+```
+
+### News API Server
+
+```console
+pipenv shell
+py news/server_api.py
+```
+
