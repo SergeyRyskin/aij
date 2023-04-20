@@ -636,11 +636,6 @@ after installation is done you can run the following command to install all the 
 ```console
 pipenv install
 ```
-
-## Testing python scripts
-
-To test the python scripts you can run the following command
-
 ## Installation of required server apps
 
 
@@ -652,14 +647,36 @@ irm get.scoop.sh | iex
 ### Install RabbitMQ via scoop package manager
 
 ```console
+scoop install python
+scoop install git
 scoop bucket add extras
 scoop install rabbitmq
 ```
 
-### News API Server
+### Running and testing the "News API Server"
+
+Open a new terminal in VSCode
 
 ```console
 pipenv shell
 py news/server_api.py
+```
+
+## Running and testing the "News API Console Client"
+
+Open a new terminal in VSCode
+
+```console
+pipenv shell
+py news/client_console.py
+```
+
+### Running and testing the "News API Desktop Client"
+
+Open a new terminal in VSCode
+
+```console
+pipenv shell
+py news/client_desktop.py
 ```
 

@@ -26,6 +26,9 @@ cvzone = "*"
 ipykernel = "*"
 jupyter = "*"
 openai = "*"
+motor = "*"
+pymongo = "*"
+pymysql = "*"
 
 [dev-packages]
 
