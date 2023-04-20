@@ -623,9 +623,17 @@ The AI journalist model should be designed to work collaboratively with human jo
 
 # Project Build
 
+## Auto-install packages
+
 The only command you will need to run is 
 
 ```console
 pip install pipenv
+```
+
+after installation is done you can run the following command to install all the packages
+
+```console
+pipenv install
 ```
 
