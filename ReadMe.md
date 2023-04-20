@@ -619,3 +619,13 @@ The AI journalist model should have a user-friendly interface that allows journa
 ## Collaboration
 
 The AI journalist model should be designed to work collaboratively with human journalists, leveraging the strengths of both to produce high-quality journalism.
+
+
+# Project Build
+
+The only command you will need to run is 
+
+```console
+pip install pipenv
+```
+

@@ -9,40 +9,61 @@ import screeninfo
 
 
 class NewsConsumer:
+    """
+    This class implements a RabbitMQ consumer.
+    """
     articles = []
     titles = 'There are no news to display...'
 
     def __init__(self, host):
+        """
+        This method initializes the RabbitMQ consumer.
+        """
         self.connection = pika.BlockingConnection(pika.ConnectionParameters(host))
         self.channel = self.connection.channel()
         self.channel.queue_declare(queue='news_stream')
         self.channel.queue_declare(queue='news_titles')
 
     def consume(self):
+        """
+        This method starts consuming messages from the RabbitMQ queue.
+        """
         self.channel.basic_consume(queue='news_stream', on_message_callback=self.add_new_article)
         self.channel.basic_consume(queue='news_titles', on_message_callback=self.update_titles)
         self.channel.start_consuming()
 
     def add_new_article(self, ch, method, properties, body):
+        """
+        This method adds a new article to the list of articles.
+        """
         new_article = body.decode('utf-8')
         # concatenate the new article to the text
         NewsConsumer.articles.append(new_article)
 
     def update_titles(self, ch, method, properties, body):
+        """
+        This method updates the titles of the news.
+        """
         global titles
         titles = body.decode('utf-8')
         print(
-            'Received titles: {}'.format(titles) + ' at {}'.format(time.strftime('%H:%M:%S', time.localtime()))
+            f"Received titles: {titles} at {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
         )
         self.titles += titles
         ch.basic_ack(delivery_tag=method.delivery_tag)
 
     def close(self):
+        """
+        This method closes the connection to the RabbitMQ server.
+        """
         if self.connection.is_open:
             self.connection.close()
 
 
 def start_consumer():
+    """
+    This method starts the RabbitMQ consumer.
+    """
     consumer = NewsConsumer('localhost')
     try:
         consumer.consume()
@@ -57,6 +78,10 @@ camera_id = 0
 
 
 def start_streaming():
+
+    """
+    This method starts the video streaming.
+    """
 
     # Using OpenCV to display the image
     cap = cv2.VideoCapture(camera_id)
@@ -187,6 +212,9 @@ def start_streaming():
 
 
 def main():
+    """
+    Main function
+    """
     start_streaming()
 
 

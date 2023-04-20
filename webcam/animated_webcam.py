@@ -104,7 +104,7 @@ class Animation:
         self.canvas = np.zeros((self.height, self.width, 3), dtype=np.uint8)
 
         # generate the sliding text animation
-        for _ in range(100):
+        for _ in range(num_frames):
             self.canvas = np.roll(self.canvas, 10, axis=0)
             self.canvas = np.roll(self.canvas, 10, axis=1)
             cv2.putText(self.canvas, *self.generate_text(text), cv2.LINE_AA)
@@ -112,7 +112,7 @@ class Animation:
             cv2.waitKey(1)
 
         # create disappearing text animation by adding boxes as black rectangles
-        for _ in range(100):
+        for _ in range(num_frames):
             # draw a rectangle at a random coordinate on the canvas
             # and add it to the list of rectangles
             cv2.rectangle(self.canvas, *self.generate_rectangle(
@@ -122,12 +122,17 @@ class Animation:
             cv2.waitKey(1)
 
         cv2.imshow('Animation', self.canvas)
-        cv2.waitKey(0)
+
+        # wait for the user to press any key to close the window
+        cv2.waitKey(1)
+
+        self.destroy_animation()
 
     def destroy_animation(self):
         """
         This method destroys the animation window.
         """
+        self.canvas = np.zeros((self.height, self.width, 3), dtype=np.uint8)
         cv2.destroyAllWindows()
 
 
@@ -137,7 +142,7 @@ def main():
     """
     width = 1280
     height = 720
-    num_frames = 50
+    num_frames = 200
 
     # generate random news headlines and place them randomly on the canvas
     tech_news = """

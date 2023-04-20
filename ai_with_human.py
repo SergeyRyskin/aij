@@ -214,6 +214,8 @@ while True:
     if not ret:
         break
 
+    ## TODO: check if subscribed speech and translation are available
+
     # display the recognized text
     if len(original_speech_data) > 1:
         # put the text at the bottom center of the frame and make the font size 12pt and white with border and gray background

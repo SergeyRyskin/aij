@@ -21,6 +21,11 @@ deepl = "*"
 pyinstaller = "*"
 pyaudio = "*"
 pyttsx3 = "*"
+screeninfo = "*"
+cvzone = "*"
+ipykernel = "*"
+jupyter = "*"
+openai = "*"
 
 [dev-packages]
 
