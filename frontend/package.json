@@ -1,0 +1,11 @@
+{
+  "name": "aij-frontend",
+  "version": "1.0.0",
+  "description": "Creating a face recognition app using Mediapipe and JavaScript involves several steps. Here's a brief overview of the process:",
+  "main": "index.html",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
