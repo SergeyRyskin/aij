@@ -680,3 +680,10 @@ pipenv shell
 py news/client_desktop.py
 ```
 
+
+
+## Sandbox
+
+One thing about the King is he loved to grow plants.  So he announced that any boy who wanted to be king would have to come to the palace and get a royal seed. In six months, the boy who grew the best plant would be the one to win the contest.  He would be the next to sit on the throne.
+
+Every boy in China was wild with joy!  Each one was sure HE would be the winner! Boys all over started to walk with pride, as if they were the winner.  Mothers and fathers were excited, too.  It sure would be grand to live at the palace!

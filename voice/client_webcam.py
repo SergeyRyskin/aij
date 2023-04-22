@@ -27,17 +27,28 @@ class RabbitMQConsumer:
 
 
 # create instance of RabbitMQ consumer class
-voice_consumer = RabbitMQConsumer('localhost', 'recognized_text')
+voice_consumer = RabbitMQConsumer('localhost', 'speech_to_text_stream')
 
 # create an instance of RabbitMQ consumer for the translation
-translation_consumer = RabbitMQConsumer('localhost', 'translation_data')
+translation_consumer = RabbitMQConsumer('localhost', 'translated_text_stream')
 
 # start the RabbitMQ consumer thread
-voice_thread = threading.Thread(target=voice_consumer.start_consuming)
-voice_thread.start()
+# voice_thread = threading.Thread(target=voice_consumer.start_consuming)
+# voice_thread.start()
+
+# start the RabbitMQ consumer thread
+translation_thread = threading.Thread(target=translation_consumer.start_consuming)
+translation_thread.start()
 
 # start the video stream
 cap = cv2.VideoCapture(0)
+
+# change the video frame size to 1280x720
+cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
+cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
+cap.set(cv2.CAP_PROP_FPS, 60)
+
+
 while True:
     # read a frame from the video stream
     ret, frame = cap.read()
@@ -71,4 +82,5 @@ cap.release()
 cv2.destroyAllWindows()
 
 # stop the RabbitMQ consumer thread
-voice_thread.join()
+# voice_thread.join()
+translation_thread.join()
