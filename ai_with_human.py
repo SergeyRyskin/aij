@@ -250,7 +250,7 @@ while True:
 
     # if s is pressed, then save the speech data to a text file
     if cv2.waitKey(1) & 0xFF == ord('s'):
-        with open('speech_data_translated.txt', 'w') as f:
+        with open('speech_data_translated.txt', 'w', encoding="utf-8") as f:
             f.write(os.linesep.join(original_speech_data))
 
 # release the video stream and destroy all windows

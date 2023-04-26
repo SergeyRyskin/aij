@@ -76,6 +76,13 @@ class Animation:
             0, 255), random.randint(0, 255))
         thickness = random.randint(1, 5)
         return center, radius, color, thickness
+    
+    def generate_photo(self, dir):
+        """
+        This method generates a random photo from a given directory
+        """
+        pass
+
 
     def generate_shape(self):
         """

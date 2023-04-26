@@ -68,12 +68,12 @@ with mp_hands.Hands(
 
         if results.multi_hand_landmarks:
             for hand_landmarks in results.multi_hand_landmarks:
-                # mp_drawing.draw_landmarks(
-                #     image,
-                #     hand_landmarks,
-                #     mp_hands.HAND_CONNECTIONS,
-                #     mp_drawing_styles.get_default_hand_landmarks_style(),
-                #     mp_drawing_styles.get_default_hand_connections_style())
+                mp_drawing.draw_landmarks(
+                    image,
+                    hand_landmarks,
+                    mp_hands.HAND_CONNECTIONS,
+                    mp_drawing_styles.get_default_hand_landmarks_style(),
+                    mp_drawing_styles.get_default_hand_connections_style())
 
                 # if left hand is raised then move the text to the left
                 if hand_landmarks.landmark[mp_hands.HandLandmark.WRIST].x < 0.2 and len(results.multi_hand_landmarks) == 1:
