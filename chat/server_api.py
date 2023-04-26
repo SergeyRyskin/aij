@@ -5,7 +5,14 @@ import openai
 
 
 class AIAssistant:
+    """
+    AI Assistant class that uses OpenAI's GPT-3 API to generate responses.
+    """
     def __init__(self, api_key):
+        """
+        Initializes the AI Assistant.
+        :param api_key: The OpenAI API key.
+        """
         self.api_key = api_key
         self.start_sequence = "\nAIJ:"
         self.restart_sequence = "\nHuman: "
@@ -20,6 +27,11 @@ class AIAssistant:
         openai.api_key = self.api_key
 
     def generate_response(self, prompt):
+        """
+        Generates a response using OpenAI's GPT-3 API.
+        :param prompt: The prompt to use for the AI to generate a response.
+        :return: The generated response.
+        """
         response = openai.Completion.create(
             model=self.model,
             prompt=prompt,
@@ -34,23 +46,42 @@ class AIAssistant:
 
 
 class NewsConsumer:
+    """
+    News Consumer class that consumes news from a RabbitMQ queue.
+    """
     def __init__(self, host, ai_assistant):
+        """
+        Initializes the News Consumer.
+        """
         self.ai_assistant = ai_assistant
         self.connection = pika.BlockingConnection(pika.ConnectionParameters(host))
         self.channel = self.connection.channel()
         self.channel.queue_declare(queue='news_stream')
 
     def consume(self):
+        """
+        Consumes news from the RabbitMQ queue.
+        """
         self.channel.basic_consume(queue='news_stream', on_message_callback=self.callback)
         self.channel.start_consuming()
 
     def callback(self, ch, method, properties, body):
+        """
+        Callback function that is called when a message is received from the RabbitMQ queue.
+        :param ch: The channel.
+        :param method: The method.
+        :param properties: The properties.
+        :param body: The body of the message.
+        """
         prompt = body.decode('utf-8').strip() + self.ai_assistant.restart_sequence
         response = self.ai_assistant.generate_response(prompt)
         print(response)
         ch.basic_ack(delivery_tag=method.delivery_tag)
 
     def close(self):
+        """
+        Closes the connection.
+        """
         if self.connection.is_open:
             self.connection.close()
 
@@ -59,6 +90,7 @@ if __name__ == '__main__':
     api_key = os.environ.get("OPENAI_API_KEY")
     ai_assistant = AIAssistant(api_key)
     consumer = NewsConsumer('localhost', ai_assistant)
+
     try:
         consumer.consume()
     except KeyboardInterrupt:
