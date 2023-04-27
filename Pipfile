@@ -4,6 +4,14 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+pep8 = "*"
+autopep8 = "*"
+pylint = "*"
+pycodestyle = "*"
+pydocstyle = "*"
+pytest = "*"
+pytest-cov = "*"
+pytest-html = "*"
 pandas = "*"
 numpy = "*"
 matplotlib = "*"
