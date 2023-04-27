@@ -29,6 +29,8 @@ openai = "*"
 motor = "*"
 pymongo = "*"
 pymysql = "*"
+replicate = "*"
+requests = "*"
 
 [dev-packages]
 
