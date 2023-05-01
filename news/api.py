@@ -7,7 +7,6 @@ import pandas as pd
 import pika
 from newsapi import NewsApiClient
 
-import motor.motor_asyncio
 from newsapi.newsapi_exception import NewsAPIException
 
 
@@ -25,7 +24,7 @@ class NewsPublisher:
         # set up a connection to RabbitMQ
         self.connection = pika.BlockingConnection(pika.ConnectionParameters(host=self.host))
         self.channel = self.connection.channel()
-        self.sources = 'bbc-news, cnn, fox-news, google-news, time, wired'
+        self.sources = 'bbc-news, cnn, fox-news, google-news, time, wired, the-new-york-times, the-wall-street-journal, the-washington-post, usa-today, abc-news, associated-press, bloomberg, business-insider, cbs-news, cnbc, entertainment-weekly, espn, fortune, fox-sports, mtv-news, national-geographic, nbc-news, new-scientist, newsweek, politico, reddit-r-all, reuters, the-hill, the-huffington-post, the-verge, the-washington-times, vice-news'
 
         try:
             self.articles = self.api.get_everything(sources=self.sources)
@@ -33,7 +32,6 @@ class NewsPublisher:
         except NewsAPIException as api_exception:
             print(f"Could not request results from NewsAPI; {api_exception}")
             print("Loading the news from the database...")
-            self.get_news_from_mongodb()
 
     def publish_news_data(self):
         """
@@ -44,7 +42,7 @@ class NewsPublisher:
         except NewsAPIException as api_exception:
             print(f"Could not request results from NewsAPI; {api_exception}")
             print("Loading the news from the database...")
-            self.get_news_from_mongodb()
+            
 
         # do not close the connection until the message is delivered
         if self.connection.is_open:
@@ -57,51 +55,22 @@ class NewsPublisher:
         """
         Publish the news articles to the RabbitMQ queue one by one...
         """
-        for article in self.articles['articles']:
-            self.channel.basic_publish(exchange='', routing_key=self.queue_name,
-                                       body=json.dumps(article).encode('utf-8'))
+        for _article in self.articles['articles']:
+            _body = json.dumps(_article).encode('utf-8')
+            self.channel.basic_publish(exchange='', routing_key=self.queue_name, body=_body)
+            print(f"Published a news article to the queue: {_article['title']}")
 
-    def save_news_to_mongodb(self):
-        """
-        Save the news to the database and return a pandas dataframe
-        """
-        df = pd.DataFrame(self.articles['articles'])
-
-        for i, row in df.iterrows():
-            df.at[i, 'title'] = row['title'].replace('\n', ' ')
-
-        # drop duplicates
-        df.drop_duplicates(inplace=True)
-
-        # save the news to the database
-        motor_client = motor.motor_asyncio.AsyncIOMotorClient('mongodb://localhost:27017')
-
-        db = motor_client['news']
-
-        collection = db['news_google-news']
-
-        collection.insert_many(df.to_dict('records'))
-
-        return df
-
-    def get_news_from_mongodb(self):
-        """
-        Get the news from the database and save it to the self.articles dictionary
-        """
-        motor_client = motor.motor_asyncio.AsyncIOMotorClient('mongodb://localhost:27017')
-        db = motor_client['news']
-        collection = db['news_google-news']
-        cursor = collection.find()
-
-        for document in cursor:
-            self.articles['articles'].append(document['title'])
+        for _headline in self.headlines['articles']:
+            _body = json.dumps(_headline).encode('utf-8')
+            self.channel.basic_publish(exchange='', routing_key=f"{self.queue_name}_headlines", body=_body)
+            print(f"Published a news headline to the queue: {_headline['title']}")
 
 
 def main():
     """
     The main function to run the server and publish the news articles to the RabbitMQ queue
     """
-    print('Server is running...')
+    print('Server is being initialized...')
 
     # get the api key from the environment variable
     api_key = os.environ.get('NEWSAPI_ORG')
@@ -112,7 +81,7 @@ def main():
     # get the news from the newsapi
     api.publish_news_data()
 
-    print('Server is stopped...')
+    print('Server is now running...')
 
 
 if __name__ == '__main__':

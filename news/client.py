@@ -33,7 +33,7 @@ class NewsConsumer:
         print(body.decode('utf-8'))
         ch.basic_ack(delivery_tag=method.delivery_tag)
 
-    def close(self):
+    def destroy(self):
         """
         This method closes the connection to the RabbitMQ server.
         """
@@ -46,4 +46,4 @@ if __name__ == '__main__':
     try:
         consumer.consume()
     except KeyboardInterrupt:
-        consumer.close()
+        consumer.destroy()
