@@ -46,6 +46,7 @@ font_size = 12
 box_size = 50
 news_are_being_played = False
 
+
 def generate_audio_from_news():
     """
     Convert text to speech and play it
@@ -56,8 +57,10 @@ def generate_audio_from_news():
     tts.save('news/news.mp3')
     # print the text
     print(
-        'The news is: \n' + titles + '\n\n' + 'The audio file has been saved to news/news.mp3\n\n'
+        'The news is: \n' + titles + '\n\n' +
+        'The audio file has been saved to news/news.mp3\n\n'
     )
+
 
 def play_news_from_audio():
     """
@@ -70,31 +73,25 @@ def play_news_from_audio():
     mixer.music.load('news/news.mp3')
     mixer.music.play()
 
+
 def pause_news_from_audio():
     """
     Pauze the news
     """
-    print(
-        'Pauzing the news...\n\n'
-    )
     mixer.music.pause()
+
 
 def stop_news_from_audio():
     """
     Stop the news
     """
-    print(
-        'Stopping the news...\n\n'
-    )
     mixer.music.stop()
+
 
 def resume_news_from_audio():
     """
     Resume the news
     """
-    print(
-        'Resuming the news...\n\n'
-    )
     mixer.music.unpause()
 
 
@@ -102,27 +99,24 @@ def rewind_news_from_audio():
     """
     Rewind the news
     """
-    print(
-        'Rewinding the news...\n\n'
-    )
     mixer.music.rewind()
+
 
 def forward_news_from_audio():
     """
     Forward the news
     """
-    print(
-        'Forwarding the news...\n\n'
-    )
     mixer.music.forward()
 
+thread_generate_audio_from_news = threading.Thread(target=generate_audio_from_news)
+thread_play_news_from_audio = threading.Thread(target=play_news_from_audio)
 
-generate_audio_from_news()
-time.sleep(1)
-play_news_from_audio()
-news_are_being_played = not news_are_being_played
+# make sure the audio file is generated before playing it
+thread_generate_audio_from_news.start()
+thread_generate_audio_from_news.join()
+thread_play_news_from_audio.start()
 
-
+# For webcam input:
 with mp_hands.Hands(
         model_complexity=0,
         min_detection_confidence=0.5,
@@ -149,11 +143,6 @@ with mp_hands.Hands(
         image.flags.writeable = True
         image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
 
-        # create a background for the text with a border
-        cv2.rectangle(image, (0, image.shape[0] - box_size), (image.shape[1], image.shape[0]), (0, 0, 0), -1)
-        # border
-        cv2.rectangle(image, (0, image.shape[0] - box_size), (image.shape[1], image.shape[0]), (255, 255, 255), 2)
-
         if results.multi_hand_landmarks:
             for hand_landmarks in results.multi_hand_landmarks:
                 mp_drawing.draw_landmarks(
@@ -165,6 +154,9 @@ with mp_hands.Hands(
 
                 # if left hand is raised then move the text to the left
                 if hand_landmarks.landmark[mp_hands.HandLandmark.WRIST].x < 0.2 and len(results.multi_hand_landmarks) == 1:
+                    for i in range(30):
+                        # move the text to the left
+                        pass
                     titles = titles[1:] + titles[0]
                     direction = 0
                     font_size = 12
@@ -173,17 +165,32 @@ with mp_hands.Hands(
 
                 # if right hand is raised then move the text to the right
                 elif hand_landmarks.landmark[mp_hands.HandLandmark.WRIST].x > 0.8 and len(results.multi_hand_landmarks) == 1:
+                    for i in range(30):
+                        # move the text to the left
+                        pass
                     direction = 1
                     font_size = 12
                     color = standard_text_color
                     box_size = 50
 
-                # if both hands are raised then increase the font size to 36pt and change the color
-                elif 0.2 < hand_landmarks.landmark[mp_hands.HandLandmark.WRIST].x < 0.8 and len(results.multi_hand_landmarks) == 2:
+                # if both hands are raised and all fingers are up then increase the font size to 36pt and change the color
+                elif 0.2 < hand_landmarks.landmark[mp_hands.HandLandmark.WRIST].x < 0.8 and len(results.multi_hand_landmarks) == 2 and hand_landmarks.landmark[mp_hands.HandLandmark.THUMB_TIP].y < hand_landmarks.landmark[mp_hands.HandLandmark.THUMB_IP].y and hand_landmarks.landmark[mp_hands.HandLandmark.INDEX_FINGER_TIP].y < hand_landmarks.landmark[mp_hands.HandLandmark.INDEX_FINGER_PIP].y and hand_landmarks.landmark[mp_hands.HandLandmark.MIDDLE_FINGER_TIP].y < hand_landmarks.landmark[mp_hands.HandLandmark.MIDDLE_FINGER_PIP].y and hand_landmarks.landmark[mp_hands.HandLandmark.RING_FINGER_TIP].y < hand_landmarks.landmark[mp_hands.HandLandmark.RING_FINGER_PIP].y and hand_landmarks.landmark[mp_hands.HandLandmark.PINKY_TIP].y < hand_landmarks.landmark[mp_hands.HandLandmark.PINKY_PIP].y:
+                    for i in range(30):
+                        # move the text to the left
+                        pass
                     font_size = 36
                     color = zoomed_text_color
                     box_size = 100
-                    news_are_being_played = not news_are_being_played
+
+                # if both hands are raised and all fingers are closed then stop the news
+                if 0.2 < hand_landmarks.landmark[mp_hands.HandLandmark.WRIST].x < 0.8 and len(results.multi_hand_landmarks) == 2 and hand_landmarks.landmark[mp_hands.HandLandmark.THUMB_TIP].y > hand_landmarks.landmark[mp_hands.HandLandmark.THUMB_IP].y and hand_landmarks.landmark[mp_hands.HandLandmark.INDEX_FINGER_TIP].y > hand_landmarks.landmark[mp_hands.HandLandmark.INDEX_FINGER_PIP].y and hand_landmarks.landmark[mp_hands.HandLandmark.MIDDLE_FINGER_TIP].y > hand_landmarks.landmark[mp_hands.HandLandmark.MIDDLE_FINGER_PIP].y and hand_landmarks.landmark[mp_hands.HandLandmark.RING_FINGER_TIP].y > hand_landmarks.landmark[mp_hands.HandLandmark.RING_FINGER_PIP].y and hand_landmarks.landmark[mp_hands.HandLandmark.PINKY_TIP].y > hand_landmarks.landmark[mp_hands.HandLandmark.PINKY_PIP].y:
+                    # stop the news
+                    pause_news_from_audio()
+
+                # if both hands are raised, thumb and index finger are open then increase the font size to 36pt and change the color
+                if 0.2 < hand_landmarks.landmark[mp_hands.HandLandmark.WRIST].x < 0.8 and len(results.multi_hand_landmarks) == 2 and hand_landmarks.landmark[mp_hands.HandLandmark.THUMB_TIP].y < hand_landmarks.landmark[mp_hands.HandLandmark.THUMB_IP].y and hand_landmarks.landmark[mp_hands.HandLandmark.INDEX_FINGER_TIP].y < hand_landmarks.landmark[mp_hands.HandLandmark.INDEX_FINGER_PIP].y and hand_landmarks.landmark[mp_hands.HandLandmark.MIDDLE_FINGER_TIP].y > hand_landmarks.landmark[mp_hands.HandLandmark.MIDDLE_FINGER_PIP].y and hand_landmarks.landmark[mp_hands.HandLandmark.RING_FINGER_TIP].y > hand_landmarks.landmark[mp_hands.HandLandmark.RING_FINGER_PIP].y and hand_landmarks.landmark[mp_hands.HandLandmark.PINKY_TIP].y > hand_landmarks.landmark[mp_hands.HandLandmark.PINKY_PIP].y:
+                    # rewind the news
+                    resume_news_from_audio()
 
         else:
             # if no hands are detected then move the text to the left
@@ -196,18 +203,16 @@ with mp_hands.Hands(
         elif direction == 1:
             titles = titles[-1] + titles[:-1]
 
-        if news_are_being_played:
-            pause_news_from_audio()
-
-
         # draw the text
-        cv2.putText(image, titles, (2, image.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, font_size / 12, color, 2)
+        cv2.putText(image, titles, (2, image.shape[0] - 10),
+                    cv2.FONT_HERSHEY_SIMPLEX, font_size / 12, color, 2)
 
         # put a logo in the top left corner
         logo = cv2.imread('logo.png')
 
         # resize the logo
-        logo = cv2.resize(logo, (int(logo.shape[1] / 12), int(logo.shape[0] / 12)))
+        logo = cv2.resize(
+            logo, (int(logo.shape[1] / 12), int(logo.shape[0] / 12)))
 
         # add the logo to the image
         image[0:logo.shape[0], 0:logo.shape[1]] = logo
@@ -223,7 +228,11 @@ with mp_hands.Hands(
         if cv2.waitKey(1) & 0xFF == ord('s'):
             cv2.imwrite('news.jpg', image)
 
-cap.release()
 
-# stop the video
+# stop the thread that plays the news
+thread_play_news_from_audio.join()
+
+# Release the webcam
+cap.release()
+# Destroy all windows
 cv2.destroyAllWindows()
