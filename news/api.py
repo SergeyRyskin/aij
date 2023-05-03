@@ -59,11 +59,15 @@ class NewsPublisher:
             _body = json.dumps(_article).encode('utf-8')
             self.channel.basic_publish(exchange='', routing_key=self.queue_name, body=_body)
             print(f"Published a news article to the queue: {_article['title']}")
+            # wait for 1 second before publishing the next article
+            time.sleep(1)
 
         for _headline in self.headlines['articles']:
             _body = json.dumps(_headline).encode('utf-8')
             self.channel.basic_publish(exchange='', routing_key=f"{self.queue_name}_headlines", body=_body)
             print(f"Published a news headline to the queue: {_headline['title']}")
+            # wait for 1 second before publishing the next article
+            time.sleep(1)
 
 
 def main():

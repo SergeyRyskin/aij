@@ -1,3 +1,5 @@
+import os
+import time
 import cv2
 import mediapipe as mp
 import cvzone
@@ -9,12 +11,21 @@ import pandas as pd
 import pika
 import threading
 
+import openai
+from gtts import gTTS
+from pygame import mixer
+
 # Using OpenCV to display the image
 cap = cv2.VideoCapture(0)
 
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1024)
 cap.set(cv2.CAP_PROP_FPS, 60)
+
+# initialize dataframe
+df = pd.read_csv('news/news.csv', encoding='utf-8')
+df = df.dropna()
+df = df.reset_index(drop=True)
 
 # text as one line string
 titles = ' '.join(df['title'].tolist())
@@ -33,6 +44,84 @@ color = standard_text_color
 direction = 0
 font_size = 12
 box_size = 50
+news_are_being_played = False
+
+def generate_audio_from_news():
+    """
+    Convert text to speech and play it
+    """
+    # initialize tts, create mp3 and play
+    tts = gTTS(text=titles, lang='en')
+    # save the audio file
+    tts.save('news/news.mp3')
+    # print the text
+    print(
+        'The news is: \n' + titles + '\n\n' + 'The audio file has been saved to news/news.mp3\n\n'
+    )
+
+def play_news_from_audio():
+    """
+    Play the news
+    """
+    print(
+        'Playing the news...\n\n'
+    )
+    mixer.init()
+    mixer.music.load('news/news.mp3')
+    mixer.music.play()
+
+def pause_news_from_audio():
+    """
+    Pauze the news
+    """
+    print(
+        'Pauzing the news...\n\n'
+    )
+    mixer.music.pause()
+
+def stop_news_from_audio():
+    """
+    Stop the news
+    """
+    print(
+        'Stopping the news...\n\n'
+    )
+    mixer.music.stop()
+
+def resume_news_from_audio():
+    """
+    Resume the news
+    """
+    print(
+        'Resuming the news...\n\n'
+    )
+    mixer.music.unpause()
+
+
+def rewind_news_from_audio():
+    """
+    Rewind the news
+    """
+    print(
+        'Rewinding the news...\n\n'
+    )
+    mixer.music.rewind()
+
+def forward_news_from_audio():
+    """
+    Forward the news
+    """
+    print(
+        'Forwarding the news...\n\n'
+    )
+    mixer.music.forward()
+
+
+generate_audio_from_news()
+time.sleep(1)
+play_news_from_audio()
+news_are_being_played = not news_are_being_played
+
 
 with mp_hands.Hands(
         model_complexity=0,
@@ -65,7 +154,6 @@ with mp_hands.Hands(
         # border
         cv2.rectangle(image, (0, image.shape[0] - box_size), (image.shape[1], image.shape[0]), (255, 255, 255), 2)
 
-
         if results.multi_hand_landmarks:
             for hand_landmarks in results.multi_hand_landmarks:
                 mp_drawing.draw_landmarks(
@@ -95,6 +183,7 @@ with mp_hands.Hands(
                     font_size = 36
                     color = zoomed_text_color
                     box_size = 100
+                    news_are_being_played = not news_are_being_played
 
         else:
             # if no hands are detected then move the text to the left
@@ -106,6 +195,10 @@ with mp_hands.Hands(
             titles = titles[1:] + titles[0]
         elif direction == 1:
             titles = titles[-1] + titles[:-1]
+
+        if news_are_being_played:
+            pause_news_from_audio()
+
 
         # draw the text
         cv2.putText(image, titles, (2, image.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, font_size / 12, color, 2)
