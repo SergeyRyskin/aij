@@ -13,7 +13,7 @@ import mediapipe as mp
 from gtts import gTTS
 from pygame import mixer
 
-from newsapi import NewsApiClient
+from newsapi import NewsApiClient        
 
 # Constants and global variables
 api = NewsApiClient(api_key=os.environ['NEWSAPI_ORG'])
@@ -42,8 +42,46 @@ csv_abs = csv_home + SEP + 'news.csv'
 audio_home = user_profile + SEP + '.aij' + SEP + 'audio'
 screenshot_home = user_profile + SEP + '.aij' + SEP + 'screenshot'
 audio_abs = audio_home + SEP + start + '.mp3'
+intro_home = user_profile + SEP + '.aij' + SEP + 'audio'
+intro_abs = intro_home + SEP + 'intro.mp3'
 video_home = user_profile + SEP + '.aij' + SEP + 'video'
-dataframe = Optional[pd.DataFrame]
+news_df = Optional[pd.DataFrame]
+weather_df = Optional[pd.DataFrame]
+
+def get_weather():
+    """
+    Get the weather from the weatherapi.com API
+    """
+    api_key = os.environ['WEATHERAPI_COM']
+    region = os.environ['WEATHERAPI_COM_REGION']
+    response = requests.get(
+        f'http://api.weatherapi.com/v1/current.json?key={api_key}&q={region}&aqi=no'
+    )
+    return response.json()
+
+def get_weather_temp_c(weather):
+    """
+    Get the temperature in Celsius
+    """
+    return weather['current']['temp_c']
+
+def get_weather_temp_f(weather):
+    """
+    Get the temperature in Fahrenheit
+    """
+    return weather['current']['temp_f']
+
+def get_weather_to_df(weather):
+    """
+    Convert the weather to a dataframe
+    """
+    # map all the articles to a list
+    current = weather['current']
+
+    # create a dataframe
+    df = pd.DataFrame(current, columns=['temp_c', 'temp_f', 'condition', 'wind_mph', 'wind_kph', 'wind_degree', 'wind_dir', 'pressure_mb', 'pressure_in', 'precip_mm', 'precip_in', 'humidity', 'cloud', 'feelslike_c', 'feelslike_f', 'vis_km', 'vis_miles', 'uv', 'gust_mph', 'gust_kph'])
+
+    return df
 
 def get_top_headlines():
     """
@@ -122,11 +160,23 @@ if network_status == 0:
     # get the top headlines from the newsapi.org API
     news = get_top_headlines()
     # convert the news to a dataframe
-    dataframe = news_to_df(news)
-else:
-    dataframe = pd.read_csv(csv_abs)
+    news_df = news_to_df(news)
 
-titles = dataframe['title'].str.cat(sep=' ') + ' ... |'
+    # get the weather from the weatherapi.com API
+    weather = get_weather()
+    # convert the weather to a dataframe
+    weather_df = get_weather_to_df(weather)
+
+else:
+    news_df = pd.read_csv(csv_abs)
+    weather_df = pd.DataFrame()
+    weather_df['temp_c'] = [0]
+    weather_df['temp_f'] = [0]
+    weather_df['condition'] = ['']
+
+
+titles = news_df['title'].str.cat(sep=' ') + ' ... |'
+weather = f"{weather_df['temp_c'][0]}c"
 
 # Using OpenCV to display the image
 cap = cv2.VideoCapture(0)
@@ -185,6 +235,26 @@ def play_news_from_audio():
     mixer.music.load(audio_abs)
     mixer.music.play()
 
+def play_intro_from_audio():
+    """
+    Play the intro
+    """
+    print(
+        f'Playing the intro: {intro_abs}\n\n'
+    )
+    mixer.init(
+        # high quality audio
+        frequency=44100,
+        # 16 bits per sample
+        size=-16,
+        # 2 channels (stereo)
+        channels=2,
+        # strong buffer to prevent audio stuttering
+        buffer=4096*2,
+    )
+    mixer.music.load(intro_abs)
+    mixer.music.play()
+
 
 def pause_news_from_audio():
     """
@@ -225,12 +295,23 @@ def draw_text(image, x, y, text, color):
     """
     Draw text on the image
     """
+    # draw a black rectangle on the image
+    cv2.rectangle(
+        image,
+        (x, y - 25),
+        # until the end of screen width
+        (x + image.shape[1], y),
+        (0, 0, 0),
+        -1
+    )
+
+    # draw the text on the image
     cv2.putText(
         image,
         text,
         (x, y),
         cv2.FONT_HERSHEY_SIMPLEX,
-        font_size,
+        font_size / 12,
         color,
         2,
         cv2.LINE_AA
@@ -288,6 +369,12 @@ def draw_zoomed_text(image, x, y, text, color):
         2,
         cv2.LINE_AA
     )
+
+thread_playing_intro_from_audio = threading.Thread(target=play_intro_from_audio)
+thread_playing_intro_from_audio.start()
+
+def generate_animation():
+    pass
 
 
 thread_generate_audio_from_news = threading.Thread(target=generate_audio_from_news)
@@ -397,7 +484,12 @@ with mp_hands.Hands(
             pass
 
         # draw the text
-        cv2.putText(image, titles, (2, image.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, font_size / 12, color, 2)
+        draw_text(image, 2, image.shape[0] - 10, titles, color)
+
+        # draw the weather on the image if the weather is available
+        if weather_df['temp_c'][0] != 0:
+            # set the position of the weather to the right top corner
+            draw_text(image, image.shape[1] - 250, 30, weather, color)
 
         # if there is a logo then draw it
         if os.path.exists(logo_abs):
@@ -411,7 +503,7 @@ with mp_hands.Hands(
             image_height, image_width, _ = image.shape
             # calculate the x and y coordinates of the logo
             x = image_width - logo_width - 10
-            y = image_height - logo_height - 10
+            y = image_height - logo_height - 30
             # draw the logo on the main image
             image[y:y + logo_height, x:x + logo_width] = logo_resized
         else:
