@@ -15,7 +15,7 @@ SEP = os.path.sep
 
 class AnimationThread(threading.Thread):
     """
-    This class represents a thread that generates an animation video
+    This class represents a thread that generates a video that reads news as string using NewsAPI and speaks it via gTTs
     @param: None
     @return: None
     """
@@ -32,6 +32,7 @@ class AnimationThread(threading.Thread):
         self.audio_intro_abs = self.audio_path + SEP + 'intro.mp3'
         self.audio_next_abs = self.audio_path + SEP + 'next.mp3'
         self.news_path = user_profile + SEP + '.aij' + SEP + 'news'
+        self.output_path = user_profile + SEP + '.aij' + SEP + 'output'
 
         # Load all the images
         self.images = []
@@ -63,7 +64,7 @@ class AnimationThread(threading.Thread):
 
         # Create the video writer object
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-        self.video_writer = cv2.VideoWriter('animation.mp4', fourcc, self.fps, (self.animation_width, self.animation_height))
+        self.video_writer = cv2.VideoWriter(self.output_path + SEP + 'animation.mp4', fourcc, self.fps, (self.animation_width, self.animation_height))
 
 
 

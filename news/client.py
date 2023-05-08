@@ -1,6 +1,5 @@
 import pika
 
-
 class NewsConsumer:
     """
     This class implements a RabbitMQ consumer.
@@ -46,3 +45,4 @@ if __name__ == '__main__':
         consumer.consume()
     except KeyboardInterrupt:
         consumer.destroy()
+
