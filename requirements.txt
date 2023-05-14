@@ -31,7 +31,6 @@ pymongo
 pymysql
 replicate
 requests
-beautifulsoup4
 bs4
 certifi
 charset-normalizer
@@ -55,3 +54,5 @@ langchain
 torch
 pygame
 pytube
+playsound
+pydub

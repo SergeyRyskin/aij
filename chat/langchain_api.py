@@ -3,8 +3,7 @@ import time
 from langchain.llms import OpenAI
 from gtts import gTTS
 from io import BytesIO
-from playsound import playsound
-
+from pygame import mixer
 
 llm = OpenAI(model_name="text-ada-001", n=2, best_of=2)
 answer = llm("Tell me a joke")
@@ -20,5 +19,14 @@ tts = gTTS(answer, lang="en")
 # save to file
 tts.save("chat/speech.mp3")
 
-# play the file
-playsound("chat/speech.mp3")
+
+# play the audio file
+mixer.init()
+
+mixer.music.load("chat/speech.mp3")
+
+mixer.music.play()
+
+while mixer.music.get_busy():
+    time.sleep(1)
+    
